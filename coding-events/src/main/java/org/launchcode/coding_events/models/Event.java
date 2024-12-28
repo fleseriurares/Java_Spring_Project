@@ -1,12 +1,15 @@
 package org.launchcode.coding_events.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.thymeleaf.context.IdentifierSequences;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -16,20 +19,23 @@ public class Event extends AbstractEntity{
     @Size(min = 3, max = 50, message = "Name must be between 3 and 50 characters.")
     private String name;
 
-    @Size(max = 500, message = "Description too long!")
-    private String description;
-    @NotBlank(message = "Email is required.")
-    @Email(message = "Invalid email. Try again.")
-    private String contactEmail;
+    @OneToOne(cascade = CascadeType.ALL)
+    @Valid
+    @NotNull
+    private EventDetails eventDetails;
 
-    private EventType type;
+    @ManyToMany
+    private final List<Tag> tags = new ArrayList<>();
 
-    public Event(String name, String description, String contact, EventType type) {
+
+    @ManyToOne
+    @NotNull(message = "Category is required!")
+    private EventCategory eventCategory;
+
+    public Event(String name, EventCategory eventCategory) {
         //this();
         this.name = name;
-        this.description = description;
-        this.contactEmail=contact;
-        this.type=type;
+        this.eventCategory=eventCategory;
     }
 
     public Event(){}
@@ -43,28 +49,29 @@ public class Event extends AbstractEntity{
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+
+    public EventCategory getEventCategory() {
+        return eventCategory;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public EventDetails getEventDetails() {
+        return eventDetails;
     }
 
-    public String getContactEmail() {
-        return contactEmail;
+    public void setEventDetails(EventDetails eventDetails) {
+        this.eventDetails = eventDetails;
     }
 
-    public void setContactEmail(String contactEmail) {
-        this.contactEmail = contactEmail;
+    public void setEventCategory(EventCategory eventCategory) {
+        this.eventCategory = eventCategory;
     }
 
-    public EventType getType() {
-        return type;
+    public List<Tag> getTags() {
+        return tags;
     }
 
-    public void setType(EventType type) {
-        this.type = type;
+    public void addTag(Tag tag){
+        this.tags.add(tag);
     }
 
     @Override
